@@ -44,20 +44,16 @@ scene.addEventListener('update',
 	}
 );
 
-loader = new Physijs.ObjectLoader();
+var json_loader = new THREE.JSONLoader();
 
-loader.load(
-	"http://192.168.1.23:8887/maps/main.json",
-	function ( obj ) {
-		obj.position.y = -2.5;
-		scene.add( obj );
-	},
+json_loader.load( "http://192.168.1.23:8887/maps/main.json", function( city, city_materials ) {
+var mesh = new Physijs.ConvexMesh(city,new THREE.MeshFaceMaterial( city_materials ));
+mesh.position.y = -.5;
+mesh.castShadow = mesh.receiveShadow = true;
+));
+scene.add( mesh );
+}
 
-	function ( xhr ) {
-		console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-	},
-
-);
 
 requestAnimationFrame( render );
 scene.simulate();
