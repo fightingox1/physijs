@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Ignition</title>
+<script src="https://fightingox1.github.io/physijs/examples/js/three.min.js"></script>
+<script type="text/javascript" src="https://fightingox1.github.io/physijs/physi.js"></script>
+<script type="text/javascript" src="https://fightingox1.github.io/physijs/examples/js/stats.js"></script>
+</head>
+<body>
+<script>
+Physijs.scripts.worker = 'https://fightingox1.github.io/physijs/physijs_worker.js';
+Physijs.scripts.ammo = 'https://fightingox1.github.io/physijs/examples/js/ammo.js';
+
+var scene, camera, renderer, loader, rander_stats, physics_stats
+var keyW, keyA, keyS, keyD
+let lock = false;
+
+initScene = function() {
+camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+
+render_stats = new Stats();
+		render_stats.domElement.style.position = 'absolute';
+		render_stats.domElement.style.top = '0px';
+		render_stats.domElement.style.zIndex = 100;
+		document.getElementById( 'viewport' ).appendChild( render_stats.domElement );
+		
+		physics_stats = new Stats();
+		physics_stats.domElement.style.position = 'absolute';
+		physics_stats.domElement.style.top = '50px';
+		physics_stats.domElement.style.zIndex = 100;
+		document.getElementById( 'viewport' ).appendChild( physics_stats.domElement );
+
+scene = new Physijs.Scene;
+scene.setGravity(new THREE.Vector3( 0, -30, 0 ));
+
+scene.addEventListener('update',
+	function() {
+		scene.simulate( undefined, 2 );
+		physics_stats.update();
+	}
+);
+
+loader = new Physijs.ObjectLoader();
+
+loader.load(
+	"http://192.168.1.23:8887/maps/main.json",
+	function ( obj ) {
+		obj.position.y = -2.5;
+		scene.add( obj );
+	},
+
+	function ( xhr ) {
+		console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+	},
+
+);
+
+requestAnimationFrame( render );
+scene.simulate();
+
+}
+
+render = function() {
+		requestAnimationFrame( render );
+		renderer.render( scene, camera );
+		render_stats.update();
+	};
+
+	window.onload = initScene;
+</script>
+<div id="viewport"></div>
+</body>
+</html>
